@@ -7,7 +7,7 @@ import { ChakraProvider, Box, Heading, Text, VStack, CSSReset, extendTheme, Aler
 const theme = extendTheme({
   colors: {
     brand: {
-      500: '#ED8936',
+      500: '#1C1C1C',
     },
   },
 });
@@ -50,11 +50,22 @@ function App() {
     fetchMessages();
   }, [web5]);
 
-  async function createMessage(firstName, lastName, messageText) {
+  async function createMessage(firstName, lastName, messageText, imageFile) {
+    let base64Image = null;
+    
+    if (imageFile) {
+      const binaryImage = await imageFile.arrayBuffer();
+      base64Image = btoa(
+        new Uint8Array(binaryImage)
+          .reduce((data, byte) => data + String.fromCharCode(byte), '')
+      );
+    }
+
     const messageData = {
       firstName,
       lastName,
-      message: messageText
+      message: messageText,
+      image: base64Image,
     };
 
     const { record } = await web5.dwn.records.create({
@@ -107,6 +118,7 @@ function App() {
     </ChakraProvider>
   );
 }
+
 
 
 
