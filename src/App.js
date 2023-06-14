@@ -5,16 +5,17 @@ import ListMessages from './components/ListMessages';
 
 function App() {
   const [web5, setWeb5] = useState(null);
+  const [myDid, setMyDid] = useState(null);
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     async function initialize() {
-      const { web5 } = await Web5.connect();
+      const { web5, did } = await Web5.connect();
       setWeb5(web5);
+      setMyDid(did);
     }
     initialize();
-}, []);
-
+  }, []);
 
   useEffect(() => {
     if (!web5) return;
@@ -76,6 +77,7 @@ function App() {
     <div>
       <Form createMessage={createMessage} />
       <ListMessages messages={messages} deleteMessage={deleteMessage} />
+      {myDid && <p>Your DID: {myDid}</p>}
     </div>
   );
 }
