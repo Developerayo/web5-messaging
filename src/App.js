@@ -2,6 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Web5 } from '@tbd54566975/web5';
 import Form from './components/Form';
 import ListMessages from './components/ListMessages';
+import { ChakraProvider, Box, Heading, Text, VStack, CSSReset, extendTheme, Alert, AlertIcon, Flex } from '@chakra-ui/react';
+
+const theme = extendTheme({
+  colors: {
+    brand: {
+      500: '#ED8936',
+    },
+  },
+});
 
 function App() {
   const [web5, setWeb5] = useState(null);
@@ -74,12 +83,31 @@ function App() {
   }
 
   return (
-    <div>
-      <Form createMessage={createMessage} />
-      <ListMessages messages={messages} deleteMessage={deleteMessage} />
-      {myDid && <p>Your DID: {myDid}</p>}
-    </div>
+    <ChakraProvider theme={theme}>
+      <CSSReset />
+      <Box minHeight="100vh" bg="gray.100" padding="6" color="gray.800">
+        <VStack spacing="8" align="center">
+          <Heading as="h1" size="2xl">Messaging App</Heading>
+          <Flex direction={{ base: "column", md: "row" }} width="100%" maxW="6xl">
+            <Box flex="1">
+              <Form createMessage={createMessage} />
+            </Box>
+            <Box flex="1" marginLeft={{ md: "8" }}>
+              <ListMessages messages={messages} deleteMessage={deleteMessage} />
+            </Box>
+          </Flex>
+          {myDid && 
+            <Alert status="info" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" height="200px">
+              <AlertIcon boxSize="40px" mr={0} />
+              <Text>Your DID: {myDid}</Text>
+            </Alert>
+          }
+        </VStack>
+      </Box>
+    </ChakraProvider>
   );
 }
+
+
 
 export default App;
