@@ -2,6 +2,7 @@
   "name": "web5",
   "version": "0.1.0",
   "private": true,
+  "homepage": "web5-messaging.netlify.app",
   "dependencies": {
     "@chakra-ui/react": "^2.7.0",
     "@emotion/react": "^11.11.1",
