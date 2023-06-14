@@ -1,13 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Web5 } from '@tbd54566975/web5';
-import Form from './components/Form';
-import ListMessages from './components/ListMessages';
-import { ChakraProvider, Box, Heading, Text, VStack, CSSReset, extendTheme, Alert, AlertIcon, Flex } from '@chakra-ui/react';
+import React, { useEffect, useState } from "react";
+import { Web5 } from "@tbd54566975/web5";
+import Form from "./components/Form";
+import ListMessages from "./components/ListMessages";
+import {
+  ChakraProvider,
+  Box,
+  Heading,
+  Text,
+  VStack,
+  CSSReset,
+  extendTheme,
+  Alert,
+  AlertIcon,
+  Flex,
+} from "@chakra-ui/react";
 
 const theme = extendTheme({
   colors: {
     brand: {
-      500: '#1C1C1C',
+      500: "#1C1C1C",
     },
   },
 });
@@ -33,10 +44,10 @@ function App() {
       const { records } = await web5.dwn.records.query({
         message: {
           filter: {
-            schema: 'http://schema-registry.org/message'
+            schema: "http://schema-registry.org/message",
           },
-          dateSort: 'createdAscending'
-        }
+          dateSort: "createdAscending",
+        },
       });
 
       const mappedMessages = [];
@@ -52,12 +63,14 @@ function App() {
 
   async function createMessage(firstName, lastName, messageText, imageFile) {
     let base64Image = null;
-    
+
     if (imageFile) {
       const binaryImage = await imageFile.arrayBuffer();
       base64Image = btoa(
-        new Uint8Array(binaryImage)
-          .reduce((data, byte) => data + String.fromCharCode(byte), '')
+        new Uint8Array(binaryImage).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ""
+        )
       );
     }
 
@@ -71,26 +84,30 @@ function App() {
     const { record } = await web5.dwn.records.create({
       data: messageData,
       message: {
-        schema: 'http://schema-registry.org/message',
-        dataFormat: 'application/json'
-      }
+        schema: "http://schema-registry.org/message",
+        dataFormat: "application/json",
+      },
     });
 
     const data = await record.data.json();
     const message = { record, data, id: record.id };
-    setMessages(prevMessages => [...prevMessages, message]);
+    setMessages((prevMessages) => [...prevMessages, message]);
   }
 
   async function deleteMessage(messageId) {
-    const messageIndex = messages.findIndex(message => message.id === messageId);
+    const messageIndex = messages.findIndex(
+      (message) => message.id === messageId
+    );
     if (messageIndex === -1) return;
 
     await web5.dwn.records.delete({
       message: {
-        recordId: messageId
-      }
+        recordId: messageId,
+      },
     });
-    setMessages(prevMessages => prevMessages.filter(message => message.id !== messageId));
+    setMessages((prevMessages) =>
+      prevMessages.filter((message) => message.id !== messageId)
+    );
   }
 
   return (
@@ -98,8 +115,14 @@ function App() {
       <CSSReset />
       <Box minHeight="100vh" bg="gray.100" padding="6" color="gray.800">
         <VStack spacing="8" align="center">
-          <Heading as="h1" size="2xl">Messaging App</Heading>
-          <Flex direction={{ base: "column", md: "row" }} width="100%" maxW="6xl">
+          <Heading as="h1" size="2xl">
+            @Web5JS/Messaging
+          </Heading>
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            width="100%"
+            maxW="6xl"
+          >
             <Box flex="1">
               <Form createMessage={createMessage} />
             </Box>
@@ -107,19 +130,24 @@ function App() {
               <ListMessages messages={messages} deleteMessage={deleteMessage} />
             </Box>
           </Flex>
-          {myDid && 
-            <Alert status="info" variant="subtle" flexDirection="column" alignItems="center" justifyContent="center" textAlign="center" height="200px">
+          {myDid && (
+            <Alert
+              status="info"
+              variant="subtle"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              textAlign="center"
+              height="200px"
+            >
               <AlertIcon boxSize="40px" mr={0} />
               <Text>Your DID: {myDid}</Text>
             </Alert>
-          }
+          )}
         </VStack>
       </Box>
     </ChakraProvider>
   );
 }
-
-
-
 
 export default App;
