@@ -114,10 +114,10 @@ function App() {
     const updatedMessage = { record, updatedData, id: record.id };
   
     setMessages((prevMessages) =>
-      prevMessages.map((message, index) =>
-        index === messageIndex ? updatedMessage : message
-      )
-    );
+    prevMessages.map((message, index) =>
+      index === messageIndex ? { ...updatedMessage, data: updatedMessage.updatedData } : message
+    )
+  );
   }
 
   async function deleteMessage(messageId) {

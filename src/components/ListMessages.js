@@ -53,10 +53,13 @@ function ListMessage({ messages, deleteMessage, updateMessage }) {
 
   const startEditing = (message) => {
     setEditMode(message.id);
-    setEditedFirstName(message.data.firstName);
-    setEditedLastName(message.data.lastName);
-    setEditedMessage(message.data.message);
+    setEditedFirstName(message.data?.firstName || "");
+    setEditedLastName(message.data?.lastName || "");
+    setEditedMessage(message.data?.message || "");
   };
+
+  // Ensure messages is an array
+  if (!Array.isArray(messages)) return null;
 
   return (
     <VStack spacing="4" align="stretch" width="full" maxWidth="400px">
@@ -64,6 +67,7 @@ function ListMessage({ messages, deleteMessage, updateMessage }) {
         Messages
       </Heading>
       {messages.map((message) => {
+        console.log("Incorrect message object", message);
         if (!message || !message.data) return null;
         return (
           <Box
@@ -123,15 +127,18 @@ function ListMessage({ messages, deleteMessage, updateMessage }) {
             ) : (
               <>
                 <Text>
-                  <strong>First Name:</strong> {message.data.firstName}
+                  <strong>First Name:</strong> {message.data.firstName || ""}
                 </Text>
                 <Text>
-                  <strong>Last Name:</strong> {message.data.lastName}
+                  <strong>Last Name:</strong>{" "}
+                  {message.data.lastName || ""}
                 </Text>
                 <Text>
-                  <strong>Message:</strong> {message.data.message}
+                  <strong>Message:</strong> {message.data.message || ""}
                 </Text>
-                {message.data.image && (
+
+                {message.data.image &&
+                typeof message.data.image === "string" ? (
                   <>
                     <Image
                       src={`data:image/png;base64,${message.data.image}`}
@@ -139,7 +146,8 @@ function ListMessage({ messages, deleteMessage, updateMessage }) {
                     />
                     <Spacer height="4" />
                   </>
-                )}
+                ) : null}
+
                 <Stack direction="row" justifyContent="flex-end">
                   <Button
                     onClick={() => startEditing(message)}
