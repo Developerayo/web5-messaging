@@ -112,13 +112,13 @@ function App() {
   
     const updatedData = await record.data.json();
     const updatedMessage = { record, updatedData, id: record.id };
+  
     setMessages((prevMessages) =>
-      prevMessages.map((message) =>
-        message.id === messageId ? updatedMessage : message
+      prevMessages.map((message, index) =>
+        index === messageIndex ? updatedMessage : message
       )
     );
   }
-  
 
   async function deleteMessage(messageId) {
     const messageIndex = messages.findIndex(
