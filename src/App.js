@@ -94,6 +94,32 @@ function App() {
     setMessages((prevMessages) => [...prevMessages, message]);
   }
 
+  async function updateMessage(messageId, updatedMessageData) {
+    const messageIndex = messages.findIndex(
+      (message) => message.id === messageId
+    );
+    if (messageIndex === -1) return;
+  
+    // Get record from DWN
+    const { record } = await web5.dwn.records.read({
+      message: {
+        recordId: messageId,
+      },
+    });
+  
+    // Update the record in DWN
+    await record.update({ data: updatedMessageData });
+  
+    const updatedData = await record.data.json();
+    const updatedMessage = { record, updatedData, id: record.id };
+    setMessages((prevMessages) =>
+      prevMessages.map((message) =>
+        message.id === messageId ? updatedMessage : message
+      )
+    );
+  }
+  
+
   async function deleteMessage(messageId) {
     const messageIndex = messages.findIndex(
       (message) => message.id === messageId
@@ -127,7 +153,11 @@ function App() {
               <Form createMessage={createMessage} />
             </Box>
             <Box flex="1" marginLeft={{ md: "8" }}>
-              <ListMessages messages={messages} deleteMessage={deleteMessage} />
+              <ListMessages
+                messages={messages}
+                deleteMessage={deleteMessage}
+                updateMessage={updateMessage}
+              />
             </Box>
           </Flex>
           {myDid && (
