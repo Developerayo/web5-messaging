@@ -99,7 +99,7 @@ function App() {
       (message) => message.id === messageId
     );
     if (messageIndex === -1) return;
-  
+
     // Get record from DWN
     const { record } = await web5.dwn.records.read({
       message: {
@@ -107,18 +107,25 @@ function App() {
       },
     });
   
+    // Old image
+    if (!updatedMessageData.image && messages[messageIndex].data.image) {
+      updatedMessageData.image = messages[messageIndex].data.image;
+    }
+
     // Update the record in DWN
     await record.update({ data: updatedMessageData });
   
     const updatedData = await record.data.json();
-    const updatedMessage = { record, updatedData, id: record.id };
+    const updatedMessage = { record, data: updatedData, id: record.id };
   
-    setMessages((prevMessages) =>
-      prevMessages.map((message, index) =>
-        index === messageIndex ? updatedMessage : message
-      )
-    );
+    setMessages((prevMessages) => {
+      return prevMessages.map((message) =>
+        message.id === messageId ? updatedMessage : message
+      );
+    });
   }
+
+  
 
   async function deleteMessage(messageId) {
     const messageIndex = messages.findIndex(
