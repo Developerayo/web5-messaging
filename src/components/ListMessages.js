@@ -23,8 +23,8 @@ function ListMessages({ messages, deleteMessage, updateMessage }) {
   const onSubmit = async (e, id) => {
     e.preventDefault();
 
-    let base64Image = null;
-    if (editedImageFile) {
+    let base64Image = editedImageFile;
+    if (editedImageFile && typeof editedImageFile !== "string") {
       const binaryImage = await editedImageFile.arrayBuffer();
       base64Image = btoa(
         new Uint8Array(binaryImage).reduce(
@@ -56,6 +56,7 @@ function ListMessages({ messages, deleteMessage, updateMessage }) {
     setEditedFirstName(message.data?.firstName || "");
     setEditedLastName(message.data?.lastName || "");
     setEditedMessage(message.data?.message || "");
+    setEditedImageFile(message.data?.image || null);
   };
 
   // Ensure messages is an array
