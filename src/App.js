@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Web5 } from "@tbd54566975/web5";
+import React from "react";
 import Form from "./components/Form";
 import ListMessages from "./components/ListMessages";
+import { useWeb5 } from './helpers/useWeb5';
+import { useMessages } from './helpers/useMessages';
 import {
   ChakraProvider,
   Box,
@@ -24,124 +25,8 @@ const theme = extendTheme({
 });
 
 function App() {
-  const [web5, setWeb5] = useState(null);
-  const [myDid, setMyDid] = useState(null);
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    async function initialize() {
-      try {
-        const { web5, did } = await Web5.connect();
-        console.log("Web5 initialized successfully", web5, did);
-        setWeb5(web5);
-        setMyDid(did);
-      } catch (error) {
-        console.error("Error initializing Web5:", error);
-      }
-    }
-    initialize();
-  }, []);
-
-  useEffect(() => {
-    if (!web5) return;
-
-    async function fetchMessages() {
-      const { records } = await web5.dwn.records.query({
-        message: {
-          filter: {
-            schema: "http://schema-registry.org/message",
-          },
-          dateSort: "createdAscending",
-        },
-      });
-
-      const mappedMessages = [];
-      for (let record of records) {
-        const data = await record.data.json();
-        const message = { record, data, id: record.id };
-        mappedMessages.push(message);
-      }
-      setMessages(mappedMessages);
-    }
-    fetchMessages();
-  }, [web5]);
-
-  async function createMessage(firstName, lastName, messageText, imageFile) {
-    let base64Image = null;
-
-    if (imageFile) {
-      const binaryImage = await imageFile.arrayBuffer();
-      base64Image = btoa(
-        new Uint8Array(binaryImage).reduce(
-          (data, byte) => data + String.fromCharCode(byte),
-          ""
-        )
-      );
-    }
-
-    const messageData = {
-      firstName,
-      lastName,
-      message: messageText,
-      image: base64Image,
-    };
-
-    const { record } = await web5.dwn.records.create({
-      data: messageData,
-      message: {
-        schema: "http://schema-registry.org/message",
-        dataFormat: "application/json",
-      },
-    });
-
-    const data = await record.data.json();
-    const message = { record, data, id: record.id };
-    setMessages((prevMessages) => [...prevMessages, message]);
-  }
-
-  async function updateMessage(messageId, updatedMessageData) {
-    const messageIndex = messages.findIndex(
-      (message) => message.id === messageId
-    );
-    if (messageIndex === -1) return;
-
-    // Get record from DWN
-    const { record } = await web5.dwn.records.read({
-      message: {
-        recordId: messageId,
-      },
-    });
-
-    // Update the record in DWN
-    await record.update({ data: updatedMessageData });
-
-    const updatedData = await record.data.json();
-    const updatedMessage = { record, updatedData, id: record.id };
-
-    setMessages((prevMessages) =>
-      prevMessages.map((message, index) =>
-        index === messageIndex
-          ? { ...updatedMessage, data: updatedMessage.updatedData }
-          : message
-      )
-    );
-  }
-
-  async function deleteMessage(messageId) {
-    const messageIndex = messages.findIndex(
-      (message) => message.id === messageId
-    );
-    if (messageIndex === -1) return;
-
-    await web5.dwn.records.delete({
-      message: {
-        recordId: messageId,
-      },
-    });
-    setMessages((prevMessages) =>
-      prevMessages.filter((message) => message.id !== messageId)
-    );
-  }
+  const { web5, myDid } = useWeb5();
+  const { messages, createMessage, updateMessage, deleteMessage } = useMessages(web5);
 
   return (
     <ChakraProvider theme={theme}>
