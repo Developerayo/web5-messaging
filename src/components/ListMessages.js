@@ -67,7 +67,6 @@ function ListMessages({ messages, deleteMessage, updateMessage }) {
         Messages
       </Heading>
       {messages.map((message) => {
-  console.log("Processing message object", message);
   if (!message || !message.data) {
     console.error("Incorrect message object", message);
     return null;
