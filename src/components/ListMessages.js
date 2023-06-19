@@ -13,7 +13,7 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 
-function ListMessage({ messages, deleteMessage, updateMessage }) {
+function ListMessages({ messages, deleteMessage, updateMessage }) {
   const [editMode, setEditMode] = useState(null);
   const [editedFirstName, setEditedFirstName] = useState("");
   const [editedLastName, setEditedLastName] = useState("");
@@ -67,8 +67,11 @@ function ListMessage({ messages, deleteMessage, updateMessage }) {
         Messages
       </Heading>
       {messages.map((message) => {
-        console.log("Incorrect message object", message);
-        if (!message || !message.data) return null;
+  console.log("Processing message object", message);
+  if (!message || !message.data) {
+    console.error("Incorrect message object", message);
+    return null;
+  }
         return (
           <Box
             key={message.id}
@@ -173,4 +176,4 @@ function ListMessage({ messages, deleteMessage, updateMessage }) {
   );
 }
 
-export default ListMessage;
+export default ListMessages;

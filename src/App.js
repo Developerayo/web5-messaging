@@ -30,9 +30,14 @@ function App() {
 
   useEffect(() => {
     async function initialize() {
-      const { web5, did } = await Web5.connect();
-      setWeb5(web5);
-      setMyDid(did);
+      try {
+        const { web5, did } = await Web5.connect();
+        console.log("Web5 initialized successfully", web5, did);
+        setWeb5(web5);
+        setMyDid(did);
+      } catch (error) {
+        console.error("Error initializing Web5:", error);
+      }
     }
     initialize();
   }, []);
@@ -99,25 +104,27 @@ function App() {
       (message) => message.id === messageId
     );
     if (messageIndex === -1) return;
-  
+
     // Get record from DWN
     const { record } = await web5.dwn.records.read({
       message: {
         recordId: messageId,
       },
     });
-  
+
     // Update the record in DWN
     await record.update({ data: updatedMessageData });
-  
+
     const updatedData = await record.data.json();
     const updatedMessage = { record, updatedData, id: record.id };
-  
+
     setMessages((prevMessages) =>
-    prevMessages.map((message, index) =>
-      index === messageIndex ? { ...updatedMessage, data: updatedMessage.updatedData } : message
-    )
-  );
+      prevMessages.map((message, index) =>
+        index === messageIndex
+          ? { ...updatedMessage, data: updatedMessage.updatedData }
+          : message
+      )
+    );
   }
 
   async function deleteMessage(messageId) {
