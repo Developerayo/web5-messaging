@@ -85,7 +85,7 @@ This custom hook is used for message management. It returns an object that conta
 
 This is how it works:
 
-1. It imports the necessary modules:
+1. Import the necessary modules:
     - `useState` and `useEffect` from the 'react' library.
 
 2. The `useMessages` function initialises the state variable `messages` to keep the list of messages and accepts`'web5` as an argument.
